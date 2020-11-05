@@ -1,0 +1,22 @@
+{
+  "name": "@kyoss79/transloco-router",
+  "version": "0.0.1",
+  "description": "Extension for ngneat/transloco to be able to translate routes",
+  "author": "Christian Wellhöfer",
+  "keywords": [
+    "angular",
+    "angular 2",
+    "i18n",
+    "transloco",
+    "router"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@angular/common": "^9.0.7",
+    "@angular/core": "^9.0.7",
+    "tslib": "^1.10.0"
+  }
+}
