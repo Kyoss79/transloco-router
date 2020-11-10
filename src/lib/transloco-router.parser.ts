@@ -17,8 +17,9 @@ export abstract class TranslocoRouterParser {
 
   private _translationObject: any;
   private _cachedLang: any;
-  private _wildcardRoute: Route;
-  private _languageRoute: Route;
+  private wildcardRoute: Route;
+  private languageRoute: Route;
+  private baseRoute: Route;
 
   constructor(
     @Inject(TranslocoService) private translate: TranslocoService,
@@ -36,10 +37,7 @@ export abstract class TranslocoRouterParser {
    * Initialize language and routes
    */
   protected init(routes: Routes): Promise<any> {
-    console.log('TranslocoRouterParser::init', this.locales);
-
     this.routes = routes;
-    console.log('Routes are', routes); // JSON.parse(JSON.stringify(this.routes)));
 
     if (!this.locales || !this.locales.length) {
       return Promise.resolve();
@@ -59,14 +57,14 @@ export abstract class TranslocoRouterParser {
 
     /** if set prefix is enforced */
     if (this.settings.alwaysSetPrefix) {
-      const baseRoute = { path: '', redirectTo: this.defaultLang, pathMatch: 'full' };
+      this.baseRoute = { path: '', redirectTo: this.defaultLang, pathMatch: 'full' };
 
       /** extract potential wildcard route */
       const wildcardIndex = routes.findIndex((route: Route) => route.path === '**');
       if (wildcardIndex !== -1) {
-        this._wildcardRoute = routes.splice(wildcardIndex, 1)[0];
+        this.wildcardRoute = routes.splice(wildcardIndex, 1)[0];
       }
-      children = this.routes.splice(0, this.routes.length, baseRoute);
+      children = this.routes.splice(0, this.routes.length, this.baseRoute);
     } else {
       children = this.routes.splice(0, this.routes.length);
     }
@@ -82,16 +80,16 @@ export abstract class TranslocoRouterParser {
     /** append children routes */
     if (children && children.length) {
       if (this.locales.length > 1 || this.settings.alwaysSetPrefix) {
-        this._languageRoute = { children };
-        this.routes.unshift(this._languageRoute);
+        this.languageRoute = { children };
+        this.routes.unshift(this.languageRoute);
       } else {
         this.routes.unshift(...children);
       }
     }
 
     /** ...and potential wildcard route */
-    if (this._wildcardRoute && this.settings.alwaysSetPrefix) {
-      this.routes.push(this._wildcardRoute);
+    if (this.wildcardRoute && this.settings.alwaysSetPrefix) {
+      this.routes.push(this.wildcardRoute);
     }
 
     console.log('Routes are', JSON.parse(JSON.stringify(this.routes)));
@@ -106,13 +104,24 @@ export abstract class TranslocoRouterParser {
   }
 
   mutateRouterRootRoute(currentLanguage: string, previousLanguage: string, routes: Routes) {
+    // console.log('TranslocoRouterParser::mutateRouterRootRoute', currentLanguage, previousLanguage);
     const previousTranslatedLanguage = this.settings.alwaysSetPrefix || previousLanguage !== this.defaultLang ?
       previousLanguage : '';
     const currentTranslatedLanguage = this.settings.alwaysSetPrefix || currentLanguage !== this.defaultLang ?
       currentLanguage : '';
+
     const baseRoute = routes.find(route => route.path === previousTranslatedLanguage);
+
     if (baseRoute) {
       baseRoute.path = currentTranslatedLanguage;
+      baseRoute.path = currentTranslatedLanguage;
+    }
+
+    // if there's an empty path being redirected to the language root, we have to change the redirectTo parameter
+    const baseRedirectRoute = routes.find( route => route.redirectTo === previousTranslatedLanguage && route.path === '');
+
+    if (baseRedirectRoute) {
+      baseRedirectRoute.redirectTo = currentLanguage;
     }
   }
 
@@ -120,22 +129,20 @@ export abstract class TranslocoRouterParser {
    * Translate routes to selected language
    */
   translateRoutes(language: string): Observable<any> {
-    console.log('TranslocoRouterParser::translateRoutes', language);
     this.setRootLanguage(language);
 
     return this.translate.selectTranslation(language)
       .pipe(
         map(translations => {
-          console.info(translations);
           this._translationObject = translations;
           this.currentLang = language;
 
-          if (this._languageRoute) {
-            this._translateRouteTree(this._languageRoute.children);
+          if (this.languageRoute) {
+            this._translateRouteTree(this.languageRoute.children);
 
             // if there is wildcard route
-            if (this._wildcardRoute && this._wildcardRoute.redirectTo) {
-              this._translateProperty(this._wildcardRoute, 'redirectTo', true);
+            if (this.wildcardRoute && this.wildcardRoute.redirectTo) {
+              this._translateProperty(this.wildcardRoute, 'redirectTo', true);
             }
           } else {
             this._translateRouteTree(this.routes);
@@ -146,9 +153,14 @@ export abstract class TranslocoRouterParser {
 
   private setRootLanguage(language: string) {
     this._cachedLang = language;
-    if (this._languageRoute) {
-      this._languageRoute.path = this.settings.alwaysSetPrefix || language !== this.defaultLang ?
+
+    if (this.languageRoute) {
+      const newPath = this.settings.alwaysSetPrefix || language !== this.defaultLang ?
         language : '';
+      this.languageRoute.path = newPath;
+    }
+    if (this.baseRoute) {
+      this.baseRoute.redirectTo = language;
     }
   }
 
@@ -200,7 +212,7 @@ export abstract class TranslocoRouterParser {
    * Translate route and return observable
    */
   translateRoute(path: string): string {
-    console.info('TranslocoRouterParser::translateRoute', path);
+    // console.info('TranslocoRouterParser::translateRoute', path);
 
     const queryParts = path.split('?');
     if (queryParts.length > 2) {
@@ -219,7 +231,6 @@ export abstract class TranslocoRouterParser {
    * Get translated value
    */
   private translateText(key: string): string {
-    console.info('TranslocoRouterParser::translateText', key);
     if (!this._translationObject) {
       console.info('TranslocoRouterParser::translateText => no translationObject');
       return key;
@@ -232,8 +243,6 @@ export abstract class TranslocoRouterParser {
     if (res === prefixedKey) {
       return key;
     }
-
-    console.log('res is', res);
 
     return res || key;
   }

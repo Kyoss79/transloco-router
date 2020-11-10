@@ -35,6 +35,7 @@ export class TranslocoRouterService {
       this.parser.translateRoutes(lang)
         .pipe(
           // set new routes to router
+          tap( () => console.log(this.parser.routes)),
           tap(() => this.router.resetConfig(this.parser.routes))
         )
         .subscribe(() => {
@@ -58,17 +59,16 @@ export class TranslocoRouterService {
     snapshot: ActivatedRouteSnapshot,
     isRoot: boolean = false
   ): any[] {
-
-    console.log('TranslocoRouterService::traverseSnapshot', snapshot);
-
     if (isRoot) {
       if (!snapshot.firstChild) {
         return [''];
       }
-      if (this.settings.alwaysSetPrefix || this.parser.currentLang !== this.parser.defaultLang) {
-        return [`/${this.parser.currentLang}`, ...this.traverseSnapshot(snapshot.firstChild.firstChild)];
-      } else {
-        return [...this.traverseSnapshot(snapshot.firstChild.firstChild)];
+      if (snapshot.firstChild.firstChild) {
+        if (this.settings.alwaysSetPrefix || this.parser.currentLang !== this.parser.defaultLang) {
+          return [`/${this.parser.currentLang}`, ...this.traverseSnapshot(snapshot.firstChild.firstChild)];
+        } else {
+          return [...this.traverseSnapshot(snapshot.firstChild.firstChild)];
+        }
       }
     }
 
@@ -127,9 +127,15 @@ export class TranslocoRouterService {
 
   private _routeChanged(): (eventPair: [NavigationStart, NavigationStart]) => void {
     return ([previousEvent, currentEvent]: [NavigationStart, NavigationStart]) => {
-      console.info('_routeChange', previousEvent, currentEvent);
       const previousLang = this.parser.detection.getLocationLang(previousEvent.url) || this.parser.defaultLang;
-      const currentLang = this.parser.detection.getLocationLang(currentEvent.url) || this.parser.defaultLang;
+
+      // if navigating to a slash '/', assume previous language
+      const currentLang = currentEvent.url === '/' ? previousLang :
+        this.parser.detection.getLocationLang(currentEvent.url) || this.parser.defaultLang;
+
+      if (currentLang !== previousLang) {
+        this.parser.mutateRouterRootRoute(currentLang, previousLang, this.router.config);
+      }
 
       this.routerEvents.next(currentLang);
     };

@@ -37,8 +37,6 @@ export class TranslocoRouterPipe implements PipeTransform, OnDestroy {
       return this.value;
     }
 
-    console.log('TranslocoRouterPipe:: transform', query);
-
     this.lastKey = query;
     this.lastLanguage = this.localize.parser.currentLang;
 
