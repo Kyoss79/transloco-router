@@ -1,6 +1,6 @@
 {
   "name": "@kyoss79/transloco-router",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Extension for @ngneat/transloco to be able to translate routes",
   "author": "Christian Wellhöfer",
   "keywords": [
