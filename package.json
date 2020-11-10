@@ -1,7 +1,7 @@
 {
   "name": "@kyoss79/transloco-router",
   "version": "0.0.1",
-  "description": "Extension for ngneat/transloco to be able to translate routes",
+  "description": "Extension for @ngneat/transloco to be able to translate routes",
   "author": "Christian Wellhöfer",
   "keywords": [
     "angular",
