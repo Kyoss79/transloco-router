@@ -1,24 +1,14 @@
 # TranslocoRouter
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.0.7.
+Transloco-Router extends the [@ngneat/transloco](https://github.com/ngneat/transloco) library to allow the translation of routes in the angular framework.
+Routes will be translated in runtime using your transloco i18n files.
 
-## Code scaffolding
+# Prerequisites
+* Angular
+* [@ngneat/transloco](https://github.com/ngneat/transloco)
 
-Run `ng generate component component-name --project TranslocoRouter` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project TranslocoRouter`.
-> Note: Don't forget to add `--project TranslocoRouter` or else it will be added to the default project in your `angular.json` file. 
+#Contributions
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
-## Build
-
-Run `ng build TranslocoRouter` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Publishing
-
-After building your library with `ng build TranslocoRouter`, go to the dist folder `cd dist/transloco-router` and run `npm publish`.
-
-## Running unit tests
-
-Run `ng test TranslocoRouter` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+#License
+MIT
