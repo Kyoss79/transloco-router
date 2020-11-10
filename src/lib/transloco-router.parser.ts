@@ -45,8 +45,6 @@ export abstract class TranslocoRouterParser {
 
     /** detect current language */
     const detectedLanguage = this.detection.detect(this.locales);
-    console.log('Detected language is', detectedLanguage);
-
     this.defaultLang = 'en';
 
     const selectedLanguage = detectedLanguage || this.defaultLang;
@@ -92,8 +90,6 @@ export abstract class TranslocoRouterParser {
       this.routes.push(this.wildcardRoute);
     }
 
-    console.log('Routes are', JSON.parse(JSON.stringify(this.routes)));
-
     /** translate routes */
     return this.translateRoutes(selectedLanguage).toPromise();
   }
@@ -104,7 +100,6 @@ export abstract class TranslocoRouterParser {
   }
 
   mutateRouterRootRoute(currentLanguage: string, previousLanguage: string, routes: Routes) {
-    // console.log('TranslocoRouterParser::mutateRouterRootRoute', currentLanguage, previousLanguage);
     const previousTranslatedLanguage = this.settings.alwaysSetPrefix || previousLanguage !== this.defaultLang ?
       previousLanguage : '';
     const currentTranslatedLanguage = this.settings.alwaysSetPrefix || currentLanguage !== this.defaultLang ?
@@ -168,8 +163,6 @@ export abstract class TranslocoRouterParser {
    * Translate the route node and recursively call for all it's children
    */
   private _translateRouteTree(routes: Routes): void {
-    console.log('TranslocoRouterParser::_translateRouteTree', routes);
-
     routes.forEach((route: Route) => {
       if (route.path && route.path !== '**') {
         this._translateProperty(route, 'path');
@@ -212,8 +205,6 @@ export abstract class TranslocoRouterParser {
    * Translate route and return observable
    */
   translateRoute(path: string): string {
-    // console.info('TranslocoRouterParser::translateRoute', path);
-
     const queryParts = path.split('?');
     if (queryParts.length > 2) {
       throw 'There should be only one query parameter block in the URL';

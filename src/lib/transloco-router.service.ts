@@ -35,7 +35,6 @@ export class TranslocoRouterService {
       this.parser.translateRoutes(lang)
         .pipe(
           // set new routes to router
-          tap( () => console.log(this.parser.routes)),
           tap(() => this.router.resetConfig(this.parser.routes))
         )
         .subscribe(() => {
