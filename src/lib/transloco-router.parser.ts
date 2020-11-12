@@ -229,7 +229,7 @@ export abstract class TranslocoRouterParser {
 
     const prefixedKey = this.prefix + key;
 
-    const res = this.translate.translate('routes.' + key, null);
+    const res = this.translate.translate(prefixedKey, null);
     // ignore non-translated text like 'ROUTES.home'
     if (res === prefixedKey) {
       return key;

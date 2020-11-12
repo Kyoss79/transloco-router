@@ -114,13 +114,16 @@ export class TranslocoRouterService {
   }
 
   translateRoute(path: string | any[]): string | any[] {
+    console.log('TranslateRoute', path);
     if (!path) {
       return path;
     }
 
     if (typeof path === 'string') {
       const url = this.parser.translateRoute(path);
-      return !path.indexOf('/') ? `/${this.parser.urlPrefix}${url}` : url;
+      // const transformed = !path.indexOf('/') ? `/${this.parser.urlPrefix}${url}` : url;
+      // console.log('TranslateRoute ->', transformed);
+      return url;
     }
   }
 

@@ -12,7 +12,7 @@ export class TranslocoRouterPipe implements PipeTransform, OnDestroy {
   private value: string | any[] = '';
   private lastKey: string | any[];
   private lastLanguage: string;
-  private subscription: Subscription;
+  private readonly subscription: Subscription;
 
   constructor(private localize: TranslocoRouterService,
               private parser: TranslocoRouterParser,
@@ -40,7 +40,7 @@ export class TranslocoRouterPipe implements PipeTransform, OnDestroy {
     this.lastKey = query;
     this.lastLanguage = this.localize.parser.currentLang;
 
-    this.value = this.parser.urlPrefix + '/' + this.localize.translateRoute(query);
+    this.value = '/' + this.parser.urlPrefix + '/' + this.localize.translateRoute(query);
     this.lastKey = query;
 
     // tslint:disable-next-line:no-bitwise
@@ -49,6 +49,7 @@ export class TranslocoRouterPipe implements PipeTransform, OnDestroy {
     }
 
     this.cd.detectChanges();
+
     return this.value;
   }
 }

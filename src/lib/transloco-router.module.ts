@@ -33,16 +33,16 @@ export class ParserInitializer {
   }
 }
 
-
 export function getAppInitializer(p: ParserInitializer, parser: TranslocoRouterParser, routes: Routes[]): any {
   return p.generateInitializer(parser, routes).bind(p);
 }
 
 
+
 @NgModule({
   imports: [
     RouterModule,
-    TranslocoModule
+    TranslocoModule,
   ],
   declarations: [TranslocoRouterPipe],
   exports: [TranslocoRouterPipe],
@@ -78,7 +78,11 @@ export class TranslocoRouterModule {
   static forChild(routes: Routes): ModuleWithProviders {
     return {
       ngModule: TranslocoRouterModule,
-      providers: []
+      providers: [{
+        provide: RAW_ROUTES,
+        multi: true,
+        useValue: routes
+      }]
     };
   }
 }
